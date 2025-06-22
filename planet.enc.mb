@@ -1,0 +1,254 @@
+import tkinter as tk
+from tkinter import font, messagebox
+import random
+
+# Данные о планетах
+planets_info = {
+    "Меркурий": {
+        "Общие сведения": (
+            "Меркурий — самая ближайшая к Солнцу планета, маленькая и каменистая. "
+            "Ее поверхность покрыта кратерами, похожими на лунные, и она не имеет атмосферы, "
+            "которая могла бы защитить от солнечного излучения."
+        ),
+        "Физические параметры": (
+            "Диаметр: около 4,88 тысяч километров. Масса — примерно 0,055 массы Земли. "
+            "Температура на поверхности варьируется от +430°C днем до -180°C ночью. "
+            "Атмосфера очень разреженная, состоит в основном из кислорода и натрия."
+        ),
+    },
+    "Венера": {
+        "Общие сведения": (
+            "Венера — вторая планета от Солнца и самая яркая после Солнца и Луны на небе. "
+            "Она имеет очень плотную атмосферу из углекислого газа с облаками серной кислоты, "
+            "что создает парниковый эффект и делает ее самой горячей планетой."
+        ),
+        "Физические параметры": (
+            "Диаметр: около 12,1 тысяч километров. Масса — примерно 0,815 массы Земли. "
+            "Температура поверхности достигает +470°C. Атмосфера очень плотная и тяжелая."
+        ),
+    },
+    "Земля": {
+        "Общие сведения": (
+            "Земля — наша родная планета, единственная известная с наличием жизни. "
+            "Имеет богатую атмосферу, океаны и разнообразные ландшафты."
+        ),
+        "Физические параметры": (
+            "Диаметр: около 12,7 тысяч километров. Масса — примерно 1 масса Земли. "
+            "Температура поверхности варьируется от -88°C до +58°C. Атмосфера содержит кислород и азот."
+        ),
+    },
+    "Марс": {
+        "Общие сведения": (
+            "Марс — красная планета с тонкой атмосферой из углекислого газа. "
+            "На его поверхности есть полярные шапки из льда и огромные каньоны."
+        ),
+        "Физические параметры": (
+            "Диаметр: около 6,78 тысяч километров. Масса — примерно 0,107 массы Земли. "
+            "Температура колеблется от -125°C до +20°C. На Марсе есть вулканы и долины."
+        ),
+    },
+    "Юпитер": {
+        "Общие сведения": (
+            "Юпитер — самая большая планета в системе, газовый гигант с мощной системой штормов "
+            "(например, Большое Красное Пятно). Имеет множество спутников."
+        ),
+        "Физические параметры": (
+            "Диаметр: около 139 тысяч километров. Масса — примерно 318 масс Земли. "
+            "Атмосфера состоит из водорода и гелия; внутри находится металлический водород."
+        ),
+    },
+    "Сатурн": {
+        "Общие сведения": (
+            "Сатурн известен своими великолепными кольцами из льда и камней. "
+            "Это газовый гигант с множеством спутников."
+        ),
+        "Физические параметры": (
+            "Диаметр: около 116 тысяч километров. Масса — примерно 95 масс Земли. "
+            "Атмосфера похожа на Юпитер; внутри есть металлический водород."
+        ),
+    },
+    "Уран": {
+        "Общие сведения": (
+            "Уран — ледяной гигант с наклоненной осью вращения почти параллельно плоскости орбиты. "
+            "Имеет кольца и множество спутников."
+        ),
+        "Физические параметры": (
+            "Диаметр: около 50,7 тысяч километров. Масса — примерно 14,5 масс Земли. "
+            "Температура очень низкая; атмосфера состоит из водорода, гелия и метана."
+        ),
+    },
+    "Нептун": {
+        "Общие сведения": (
+            "Нептун - самый дальний от Солнца газовый гигант с сильными ветрами и штормами."
+            "Имеет ярко-голубую окраску благодаря метану в атмосфере."
+        ),
+        "Физические параметры": (
+            "Диаметр: около 49,5 тысяч километров."
+            "Масса: примерно 17 масс Земли."
+            "Температура поверхности очень низкая; внутри есть активные штормы."
+        ),
+    },
+}
+
+
+# Сама энциклопедия
+class PlanetEncyclopedia:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Энциклопедия по планетам Солнечной системы")
+
+        # Настройка шрифтов
+        self.font_title = font.Font(family="Times New Roman", size=14, weight="bold")
+        self.font_text = font.Font(family="Times New Roman", size=12)
+
+        # Создаем рамки для организации интерфейса
+        self.top_frame = tk.Frame(root)
+        self.top_frame.pack(padx=10, pady=10)
+
+        self.info_frame = tk.Frame(root, bg="#FFB5C5")
+        self.info_frame.pack(padx=10, pady=10)
+
+        # Заголовок
+        self.label_title = tk.Label(
+            self.top_frame, text="Выберите планету:", font=self.font_title
+        )
+        self.label_title.pack()
+
+        # Кнопки для выбора планеты
+        self.buttons_frame = tk.Frame(self.top_frame)
+        self.buttons_frame.pack(pady=5)
+
+        for planet in planets_info:
+            btn = tk.Button(
+                self.buttons_frame,
+                text=planet,
+                command=lambda p=planet: self.show_info(p),
+                bg="#EEAEEE",
+                font=("Times New Roman", 12),
+                activebackground="#FFE1FF",
+            )
+            btn.pack(side=tk.LEFT, padx=3)
+
+        # Переключатели (Radiobutton) для выбора категории информации
+        self.category_var = tk.StringVar(value="Общие сведения")
+        categories = ["Общие сведения", "Физические параметры"]
+        for cat in categories:
+            rb = tk.Radiobutton(
+                self.top_frame,
+                text=cat,
+                variable=self.category_var,
+                value=cat,
+                command=self.update_text,
+                font=("Times New Roman", 12),
+                selectcolor="#CC80B5",
+                relief=tk.GROOVE,
+                height=2,
+            )
+            rb.pack(side=tk.LEFT, padx=5)
+
+        # Entry для отображения выбранной планеты
+        self.entry_planet = tk.Entry(
+            self.info_frame, width=30, font=("Times New Roman", 12)
+        )
+        self.entry_planet.pack(pady=5)
+
+        # Text виджет для подробного описания
+        self.text_info = tk.Text(
+            self.info_frame,
+            width=70,
+            height=14,
+            font=self.font_text,
+        )
+        self.text_info.pack()
+
+        # Кнопка для открытия формы с игрой "Магический шар предсказаний"
+        self.game_button = tk.Button(
+            self.root, text="Играть в 'Магический шар'", command=self.open_magic_ball
+        )
+        self.game_button.pack(pady=10)
+
+    def show_info(self, planet_name):
+        # Заполняем Entry выбранной планетой
+        self.entry_planet.delete(0, tk.END)
+        self.entry_planet.insert(0, planet_name)
+        # Обновляем описание в Text в зависимости от выбранной категории
+        self.update_text()
+
+    def update_text(self):
+        planet_name = self.entry_planet.get()
+        category = self.category_var.get()
+
+        info_dict = planets_info.get(planet_name)
+
+        if info_dict:
+            info_text = info_dict.get(category) or "Информация недоступна."
+            # Обновляем Text виджет
+            self.text_info.delete(1.0, tk.END)
+            self.text_info.insert(tk.END, info_text)
+
+    def open_magic_ball(self):
+        MagicBallWindow(self.root)
+
+
+# Магический шар
+class MagicBallWindow:
+    def __init__(self, parent):
+        self.top = tk.Toplevel(parent)
+        self.top.title("Магический шар предсказаний")
+        self.top.geometry("400x300")
+        self.create_widgets()
+        # Варианты ответов
+        self.predictions = [
+            "Да, обязательно.",
+            "Нет, не стоит.",
+            "Возможно, стоит попробовать еще раз.",
+            "Конечно, да!",
+            "Скорее всего, нет.",
+            "Не могу предсказать.",
+            "Абсолютно точно.",
+            "Лучше не задавать этот вопрос.",
+            "ОПРЕДЕЛЕННО MEOW",
+        ]
+
+    # Текст и окно
+    def create_widgets(self):
+        label = tk.Label(
+            self.top,
+            text="Задайте свой вопрос и нажмите 'Предсказать'",
+            font=("Times New Roman", 12),
+            bg="#FFB5C5",
+        )
+        label.pack(pady=10)
+        # Поле для ввода вопроса
+        self.entry_question = tk.Entry(self.top, width=40, font=("Times New Roman", 12))
+        self.entry_question.pack(pady=5)
+        # Кнопка для предсказания
+        self.btn_predict = tk.Button(
+            self.top,
+            text="Предсказать",
+            background="#EEAEEE",
+            command=self.get_prediction,
+        )
+        self.btn_predict.pack(pady=10)
+        # Метка для ответа
+        self.label_answer = tk.Label(
+            self.top, text="", font=("Times New Roman", 14, "bold"), fg="#CD3278"
+        )
+        self.label_answer.pack(pady=10)
+
+    def get_prediction(self):
+        question = self.entry_question.get()
+        # Если поле ввода пустое
+        if not question.strip():
+            messagebox.showwarning("Внимание", "Пожалуйста, задайте вопрос.")
+            return
+        # Выбирает случайный ответ
+        answer = random.choice(self.predictions)
+        self.label_answer.config(text=answer)
+
+
+# Основной запуск
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = PlanetEncyclopedia(root)
+    root.mainloop()
